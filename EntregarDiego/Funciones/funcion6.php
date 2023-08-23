@@ -38,10 +38,7 @@ function mostrarCartas($cartas) {
 }
 
 function evaluarMano($cartas) {
-    // Implementar la evaluación de la mano según las reglas del Poker
-    // Aquí puedes utilizar estructuras condicionales y funciones adicionales si es necesario
-    
-    // Ejemplo: Mostrar la mano del jugador
+
     echo "Mano del jugador:\n";
     mostrarCartas($cartas);
 }
