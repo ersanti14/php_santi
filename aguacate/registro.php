@@ -63,50 +63,74 @@ require_once("aguacate.php")
 </body>
 <?php
 
-    if (isset($_POST['btn1'])) {
-        $nombre = $_POST['nom'];
-        $documento = $_POST['doc'];
-        $placa = $_POST['placa'];
-        $marca = $_POST['marca'];
-        $color = $_POST['color'];
 
-        $cliente = new Cliente($conexion);
-        $cliente->intdpi = $documento;
-        $cliente->srtnombre = $nombre;
-        $cliente->nuevoCliente();
+if (isset($_POST['btn1'])) {
+    $nombre = $_POST['nom'];
+    $documento = $_POST['doc'];
+    $placa = $_POST['placa'];
+    $marca = $_POST['marca'];
+    $color = $_POST['color'];
 
-        $id_cliente = $cliente->getLastInsertedId();
+    $cliente = new Cliente($conexion);
+    $cliente->intdpi = $documento;
+    $cliente->srtnombre = $nombre;
+    $cliente->nuevoCliente();
 
-        $carro = new Carro($conexion, $documento, $nombre, $color, $marca, $placa, $id_cliente);
-        $carro->srtcolor = $color;
-        $carro->srtplaca = $placa;
-        $carro->srtmarca = $marca;
-        $carro->nuevoCarro();
+    $id_cliente = $cliente->getLastInsertedId();
 
-        $id_autos = $carro->getLastInsertedId();
+    $carro = new Carro($conexion, $documento, $nombre, $color, $marca, $placa, $id_cliente);
+    $carro->srtcolor = $color;
+    $carro->srtplaca = $placa;
+    $carro->srtmarca = $marca;
+    $carro->nuevoCarro();
 
+    $id_autos = $carro->getLastInsertedId();
 
-        $id_Puesto = $aguacate -> getLastInserteId();
+    $piso = 1; // Piso por defecto es 1
+$precio = 200;
+$precioTotal = 0;
+$horas = 0;
+$id_puesto = 1;
 
+try {
+    $sqlCountPiso = "SELECT COUNT(*) AS numRegistros FROM parqueo WHERE id_piso = :piso";
+    $stmtCountPiso = $conexion->prepare($sqlCountPiso);
+    $stmtCountPiso->bindParam(":piso", $piso);
+    $stmtCountPiso->execute();
+    $resultCountPiso = $stmtCountPiso->fetch(PDO::FETCH_ASSOC);
+    $numRegistrosPiso = $resultCountPiso['numRegistros'];
+
+    if ($numRegistrosPiso > 10 && $piso < 4) {
+        $piso++;
         
-            $piso = 1; 
-            $precio = 200;  
-            $precioTotal = 0; 
-            $horas = 0; 
-            $id_Puesto =5;
-            
-            $aguacate = new Aguacate($conexion, $documento, $nombre, $color, $marca, $placa, $id_cliente, $id_autos, $id_Puesto, $horas, $piso, $precio, $precioTotal, "", "00:00:00");
-            
+        // Actualiza el piso en la tabla pisos
+        $sqlUpdatePiso = "UPDATE pisos SET idPiso = :nuevoPiso WHERE idPiso = :pisoAnterior";
+        $stmtUpdatePiso = $conexion->prepare($sqlUpdatePiso);
+        $stmtUpdatePiso->bindParam(":nuevoPiso", $piso);
+        $stmtUpdatePiso->bindParam(":pisoAnterior", $piso - 1);
+        $stmtUpdatePiso->execute();
+        
+        // Actualiza el estado de puestos en la tabla puestos
+        $sqlUpdateEstadoPuestos = "UPDATE puestos SET estado = 0 WHERE piso = :piso";
+        $stmtUpdateEstadoPuestos = $conexion->prepare($sqlUpdateEstadoPuestos);
+        $stmtUpdateEstadoPuestos->bindParam(":piso", $piso - 1);
+        $stmtUpdateEstadoPuestos->execute();
+    }
+} catch (PDOException $e) {
+    echo "Error al ejecutar la consulta: " . $e->getMessage();
+}
 
-            $fechaHoraEntradaArray = $aguacate->fechaIngreso();
-            $fechaHoraEntrada = $fechaHoraEntradaArray['fecha'] . ' ' . $fechaHoraEntradaArray['hora'];
-            
+    $aguacate = new Aguacate($conexion, $documento, $nombre, $color, $marca, $placa, $id_cliente, $id_autos, $id_puesto, $horas, $piso, $precio, $precioTotal, "", "00:00:00");
 
-            $aguacate->fechaHoraEntrada = $fechaHoraEntrada;
-            
-            $aguacate->nuevoParqueo();
-        }
+    $fechaHoraEntradaArray = $aguacate->fechaIngreso();
+    $fechaHoraEntrada = $fechaHoraEntradaArray['fecha'] . ' ' . $fechaHoraEntradaArray['hora'];
+
+    $aguacate->fechaHoraEntrada = $fechaHoraEntrada;
+    $aguacate->nuevoParqueo();
+}
+
 ?>
+
 </html> <!-- <script type="text/javascript">
     window.alert('Usuario registrado con exito...')
 </script> -->

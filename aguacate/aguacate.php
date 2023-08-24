@@ -36,32 +36,51 @@ class Aguacate extends Carro
         return array('hora' => $horaActual, 'fecha' => $fechaActual);
     }
 
+    public function obtenerPiso()
+    {
+        $sql = "SELECT idPiso FROM pisos WHERE idPiso = 1"; // Cambia la condición para obtener el piso
+        $stmt = $this->conexion->prepare($sql);
+        if ($stmt->execute()) {
+            $piso = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($piso !== false) {
+                return $piso['idPiso'];
+            } else {
+                $piso = 1;
+            }
+        } else {
+            echo "Datos insuficientes";
+        }
+    }
+    
+
     public function nuevoParqueo()
     {
-        if ($this->intIdPuesto && $this->intIdAuto && $this-> fechaHoraEntrada && $this->fechaHoraSalida) {
+        if ($this->piso && $this->intIdAuto && $this-> fechaHoraEntrada && $this->fechaHoraSalida) {
             $fechaHoraEntradaArray = $this->fechaIngreso(); 
             $fechaHoraEntrada = $fechaHoraEntradaArray['fecha'] . ' ' . $fechaHoraEntradaArray['hora'];
 
             $fechaHoraSalida = "00:00:00";
 
-            $sql = "INSERT INTO parqueo(idPuesto, idAuto, fechaIngreso, fechaSalida) VALUES (:puesto, :idauto, :horaEntra, :horaSali)";
+            $this->piso = $this->obtenerPiso();
+
+            $sql = "INSERT INTO parqueo(id_piso, idAuto, fechaIngreso, fechaSalida) VALUES (:piso, :idauto, :horaEntra, :horaSali)";
             $stmt = $this->conexion->prepare($sql);
-            $stmt->bindParam(":puesto", $this->intIdPuesto);
+            $stmt->bindParam(":piso", $this->piso);
             $stmt->bindParam(":idauto", $this->intIdAuto);
             $stmt->bindParam(":horaEntra", $fechaHoraEntrada);
             $stmt->bindParam(":horaSali", $fechaHoraSalida);
             $stmt->execute();
+            
         } else {
             echo "Datos insuficientes";
         }
     }
+
+
     public function getLastInsertedId() {
         return $this->conexion->lastInsertId();
     }
 
-    public function pisoAuto(){
-        
-    }
 
     public function sumaPrecio()
     {
@@ -69,12 +88,6 @@ class Aguacate extends Carro
         return $this->precioTotal;
     }
 }
-
-
-
-
-
-
 
 /* 
     public function getFichaParqueadero()

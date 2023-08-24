@@ -42,7 +42,7 @@ require_once("aguacate.php");
         $sql = "SELECT c.id_clientes, c.cedula, c.nombre, a.placa, a.marca, a.color, p.fechaIngreso, f.puestos, z.piso FROM clientes c
         INNER JOIN autos a ON c.id_clientes = a.idCliente
         INNER JOIN parqueo p ON a.id_autos = p.idAuto
-        inner join puestos f  on p.idPuesto = f.id
+        inner join puestos f  on p.id_piso = f.id
         inner join pisos z  on  f.piso = z.idPiso";
         $resultado = $conexion->prepare($sql);
         $resultado->execute();
