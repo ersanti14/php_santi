@@ -2,32 +2,7 @@
 require_once("cliente.php");
 require_once("carro.php");
 require_once("conexion.php");
-
-$conexionObj = new ConePDO();
-$conexion = $conexionObj->getConexion();
-
-if (isset($_POST['btn1'])) {
-    $nombre = $_POST['nom'];
-    $documento = $_POST['doc'];
-    $placa = $_POST['placa'];
-    $marca = $_POST['marca'];
-    $color = $_POST['color'];
-
-    $cliente = new Cliente($conexion);
-    $cliente->intdpi = $documento;
-    $cliente->srtnombre = $nombre;
-    $cliente->nuevoCliente();
-
-
-
-
-    
-    $carro = new Carro($conexion, $documento, $nombre, $color, $marca, $placa,$id_cliente);
-    $carro->srtcolor = $color;
-    $carro->srtplaca = $placa;
-    $carro->srtmarca = $marca; 
-    $carro->nuevoCarro();
-}
+require_once("aguacate.php")
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -46,10 +21,7 @@ if (isset($_POST['btn1'])) {
         <nav>
             <div class="aguacate">
                 <div class="back">
-                    <a class="atras" href="inicioAguacate.html"> <svg xmlns="http://www.w3.org/2000/svg"
-                            class="icon icon-tabler icon-tabler-arrow-left" width="32" height="32" viewBox="0 0 24 24"
-                            stroke-width="3" stroke="currentColor" fill="none" stroke-linecap="round"
-                            stroke-linejoin="round">
+                    <a class="atras" href="inicioAguacate.html"> <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-arrow-left" width="32" height="32" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                             <path d="M5 12l14 0"></path>
                             <path d="M5 12l6 6"></path>
@@ -61,6 +33,12 @@ if (isset($_POST['btn1'])) {
             </div>
         </nav>
     </header>
+    <div class="mensajeCone">
+        <?php
+        $conexionObj = new ConePDO();
+        $conexion = $conexionObj->getConexion();
+        ?>
+    </div>
     <section class="formulario">
         <div class="formu">
             <h2>Registar Vehiculo</h2>
@@ -80,21 +58,55 @@ if (isset($_POST['btn1'])) {
                 </fieldset>
             </form>
         </div>
+
     </section>
 </body>
+<?php
+
+    if (isset($_POST['btn1'])) {
+        $nombre = $_POST['nom'];
+        $documento = $_POST['doc'];
+        $placa = $_POST['placa'];
+        $marca = $_POST['marca'];
+        $color = $_POST['color'];
+
+        $cliente = new Cliente($conexion);
+        $cliente->intdpi = $documento;
+        $cliente->srtnombre = $nombre;
+        $cliente->nuevoCliente();
+
+        $id_cliente = $cliente->getLastInsertedId();
+
+        $carro = new Carro($conexion, $documento, $nombre, $color, $marca, $placa, $id_cliente);
+        $carro->srtcolor = $color;
+        $carro->srtplaca = $placa;
+        $carro->srtmarca = $marca;
+        $carro->nuevoCarro();
+
+        $id_autos = $carro->getLastInsertedId();
+
+
+        $id_Puesto = $aguacate -> getLastInserteId();
+
+        
+            $piso = 1; 
+            $precio = 200;  
+            $precioTotal = 0; 
+            $horas = 0; 
+            $id_Puesto =5;
+            
+            $aguacate = new Aguacate($conexion, $documento, $nombre, $color, $marca, $placa, $id_cliente, $id_autos, $id_Puesto, $horas, $piso, $precio, $precioTotal, "", "00:00:00");
+            
+
+            $fechaHoraEntradaArray = $aguacate->fechaIngreso();
+            $fechaHoraEntrada = $fechaHoraEntradaArray['fecha'] . ' ' . $fechaHoraEntradaArray['hora'];
+            
+
+            $aguacate->fechaHoraEntrada = $fechaHoraEntrada;
+            
+            $aguacate->nuevoParqueo();
+        }
+?>
 </html> <!-- <script type="text/javascript">
     window.alert('Usuario registrado con exito...')
 </script> -->
-
-<!-- ?php
-
-require_once("carro.php");
-//($horaEntrada, $horaSalida, $piso, $precio, $precioTotal,$horas, $documento, $nombre, $color, $marca)
-
-$miAguacate = new carro("2023-08-14 08:00", "2023-08-14 12:00", 2, 200, 0, 8, "1004418388", "santiago", color: "azul", marca: "ford");
-
-$fichaGenerada = $miAguacate->getFichaParqueadero();
-
-echo $fichaGenerada;
-
-?> -->

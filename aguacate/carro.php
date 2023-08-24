@@ -33,25 +33,7 @@ class Carro extends Cliente {
             echo "Color, placa y marca son obligatorios para insertar un nuevo carro.";
         }
     }
-}
-
-
-
-/* $conexionObj = new ConexionPDO();
-$conexion = $conexionObj->getConexion();
-
-$carro = new Carro($conexion, "123456789", "Juan Pérez", "Rojo", "Toyota", "ABC123");
-$carro->insertCarro(); */
-
-/* 
-    if(isset($_POST['btn1'])) {
-        $placa = $_POST['nom'];
-        $marca = $_POST['doc'];
-        $color = $_POST['doc'];
-    
-        $fltcarro = new carro($conexion, $documento, $nombre, $placa, $marca, $color);
-    
-        $fltcarro->insertCarro();
+    public function getLastInsertedId() {
+        return $this->conexion->lastInsertId();
     }
- */
-?>
+}
