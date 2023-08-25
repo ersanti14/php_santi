@@ -86,49 +86,30 @@ if (isset($_POST['btn1'])) {
 
     $id_autos = $carro->getLastInsertedId();
 
-    $piso = 1; // Piso por defecto es 1
+
 $precio = 200;
 $precioTotal = 0;
 $horas = 0;
-$id_puesto = 1;
+$puestoNumero=3;
 
-try {
-    $sqlCountPiso = "SELECT COUNT(*) AS numRegistros FROM parqueo WHERE id_piso = :piso";
-    $stmtCountPiso = $conexion->prepare($sqlCountPiso);
-    $stmtCountPiso->bindParam(":piso", $piso);
-    $stmtCountPiso->execute();
-    $resultCountPiso = $stmtCountPiso->fetch(PDO::FETCH_ASSOC);
-    $numRegistrosPiso = $resultCountPiso['numRegistros'];
 
-    if ($numRegistrosPiso > 10 && $piso < 4) {
-        $piso++;
-        
-        // Actualiza el piso en la tabla pisos
-        $sqlUpdatePiso = "UPDATE pisos SET idPiso = :nuevoPiso WHERE idPiso = :pisoAnterior";
-        $stmtUpdatePiso = $conexion->prepare($sqlUpdatePiso);
-        $stmtUpdatePiso->bindParam(":nuevoPiso", $piso);
-        $stmtUpdatePiso->bindParam(":pisoAnterior", $piso - 1);
-        $stmtUpdatePiso->execute();
-        
-        // Actualiza el estado de puestos en la tabla puestos
-        $sqlUpdateEstadoPuestos = "UPDATE puestos SET estado = 0 WHERE piso = :piso";
-        $stmtUpdateEstadoPuestos = $conexion->prepare($sqlUpdateEstadoPuestos);
-        $stmtUpdateEstadoPuestos->bindParam(":piso", $piso - 1);
-        $stmtUpdateEstadoPuestos->execute();
-    }
-} catch (PDOException $e) {
-    echo "Error al ejecutar la consulta: " . $e->getMessage();
+
+$aguacate = new Aguacate($conexion, $documento, $nombre, $color, $marca, $placa, $id_cliente, $id_autos, $horas, "", $precio, $precioTotal, "", "00:00:00",$puestoNumero);
+
+/* $puestoNumero = $aguacate->obtenerIdPiso(); */
+
+$piso = $aguacate->marcarPuestoActivo();
+
+$fechaHoraEntradaArray = $aguacate->fechaIngreso();
+$fechaHoraEntrada = $fechaHoraEntradaArray['fecha'] . ' ' . $fechaHoraEntradaArray['hora'];
+
+$aguacate->fechaHoraEntrada = $fechaHoraEntrada;
+
+
+$aguacate->nuevoParqueo();
+
+
 }
-
-    $aguacate = new Aguacate($conexion, $documento, $nombre, $color, $marca, $placa, $id_cliente, $id_autos, $id_puesto, $horas, $piso, $precio, $precioTotal, "", "00:00:00");
-
-    $fechaHoraEntradaArray = $aguacate->fechaIngreso();
-    $fechaHoraEntrada = $fechaHoraEntradaArray['fecha'] . ' ' . $fechaHoraEntradaArray['hora'];
-
-    $aguacate->fechaHoraEntrada = $fechaHoraEntrada;
-    $aguacate->nuevoParqueo();
-}
-
 ?>
 
 </html> <!-- <script type="text/javascript">

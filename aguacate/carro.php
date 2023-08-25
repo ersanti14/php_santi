@@ -22,7 +22,7 @@ class Carro extends Cliente {
 
     public function nuevoCarro() {
         if ($this->srtcolor && $this->srtplaca && $this->srtmarca) {
-            $sql = "INSERT INTO autos (color, placa, marca,idCliente) VALUES (:color, :placa, :marca, :idCliente)";
+            $sql = "INSERT INTO autos (color, placa, marca, idCliente) VALUES (:color, :placa, :marca, :idCliente)";
             $stmt = $this->conexion->prepare($sql);
             $stmt->bindParam(":color", $this->srtcolor);
             $stmt->bindParam(":placa", $this->srtplaca);
